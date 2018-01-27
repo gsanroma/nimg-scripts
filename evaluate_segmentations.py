@@ -2,8 +2,6 @@ __author__ = 'gsanroma'
 
 import argparse
 import os
-import subprocess
-import sys
 import csv
 from scheduler import Launcher, check_file_repeat
 from shutil import rmtree, move
@@ -16,15 +14,13 @@ parser.add_argument("--est_suffix", type=str, nargs=1, required=True, help="Suff
 parser.add_argument("--gtr_dir", type=str, nargs=1, required=True, help="Directory of ground-truth segmentations")
 parser.add_argument("--gtr_suffix", type=str, nargs=1, required=True, help="Suffix of ground truth segmentation files")
 parser.add_argument("--per_subject_dice", action='store_true', help="keep per per subject dices")
+parser.add_argument("--num_procs", type=int, nargs=1, default=[30], help="Number of concurrent processess")
 
-args = parser.parse_args()
-# args = parser.parse_args('--est_dir /Users/gsanroma/DATA/deeplf/models_adni/Labfus/kk --est_suffix _nl_grp1.nii.gz --gtr_dir /Users/gsanroma/DATA/deeplf/data/mini_val7 --gtr_suffix _labels.nii.gz --per_subject_dice'.split())
-
-
-if sys.platform == 'darwin':
-    is_hpc = False
-else:
-    is_hpc = True
+# args = parser.parse_args()
+args = parser.parse_args('--est_dir /home/sanromag/DATA/WMH/BIANCA/shahid_run '
+                         '--est_suffix _t95.nii.gz '
+                         '--gtr_dir /home/sanromag/DATA/WMH/RS/data_proc '
+                         '--gtr_suffix _WMHmaskbin.nii.gz '.split())
 
 #
 # Retrieve estimated files
@@ -50,7 +46,7 @@ os.makedirs(tmp_dir)
 
 imagemath_path = os.path.join(os.environ['ANTSPATH'],'ImageMath')
 
-wait_jobs = [os.path.join(os.environ['ANTSSCRIPTS'], "waitForSGEQJobs.pl"), '0', '10']
+launcher = Launcher(args.num_procs[0])
 
 out_paths = []
 
@@ -67,19 +63,14 @@ for i_img in range(Nimg):
 
     print("Launching Dice evaluation job for labels %s" % est_names[i_img])
 
-    qsub_launcher.name = est_names[i_img]
-    qsub_launcher.folder = tmp_dir
-    qsub_launcher.queue = 'short.q'
-    job_id = qsub_launcher.run()
+    launcher.add(est_names[i_img], cmdline, tmp_dir)
+    launcher.run(est_names[i_img])
 
-    if is_hpc:
-        wait_jobs += [job_id]
+print "Waiting for Dice evaluation jobs to finish..."
 
+launcher.wait()
 
-if is_hpc:
-    print("Waiting for Dice evaluation jobs to finish...")
-    subprocess.call(wait_jobs)
-print("Dice evaluation finished.")
+print "Dice evaluation finished."
 
 subj_dices = dict([])
 label_dices = dict([])
