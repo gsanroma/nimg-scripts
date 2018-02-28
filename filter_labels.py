@@ -12,13 +12,15 @@ parser.add_argument("--include", type=int, nargs='+', action="append", help="lab
 parser.add_argument("--keep_ids", action="store_true", help="keep label ids of original labels (rather than grouping them using the 1st id)")
 parser.add_argument("--map", type=int, nargs=2, action="append", help="map 1st label id to the 2nd (after filtering, if applicable)")
 
-# args = parser.parse_args()
-args = parser.parse_args('--in_dir /home/sanromag/DATA/WMH/test_RS/kk/wmh_ana '
-                         '--in_suffix _aseg.nii.gz '
-                         '--out_dir /home/sanromag/DATA/WMH/test_RS/kk/wmh_ana '
-                         '--out_suffix _vent.nii.gz '
-                         '--include 43 4 '
-                         '--map 43 1 '.split())
+args = parser.parse_args()
+# args = parser.parse_args('--in_dir /home/sanromag/DATA/WMH/test_RS/subj '
+#                          '--in_suffix _aseg.nii.gz '
+#                          '--out_dir /home/sanromag/DATA/WMH/test_RS/subj '
+#                          # '--out_suffix _vent.nii.gz '
+#                          # '--include 43 4 '
+#                          '--out_suffix _co.nii.gz '
+#                          '--include 42 3 '
+#                          '--map 42 1 '.split())
 
 
 files_list = os.listdir(args.in_dir[0])
