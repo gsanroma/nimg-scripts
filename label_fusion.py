@@ -41,22 +41,26 @@ def label_fusion(launcher, target_path, atlas_img_path_list, atlas_lab_path_list
 
         if method == 'joint':
 
-            jointfusion_path = os.path.join(os.environ['ANTSPATH'], 'jointfusion')
+            jointfusion_path = os.path.join(os.environ['ANTSPATH'], 'antsJointFusion')
 
             # prob_path = os.path.join(target_tmp_dir, 'prob%d.nii.gz')
             prob_path = os.path.join(out_dir, out_name + '_prob%d.nii.gz')
 
-            cmdline = ['ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=%d' % num_itk_threads, jointfusion_path, '3', '1']
+            cmdline = ['ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=%d' % num_itk_threads, jointfusion_path]
+            cmdline.extend(['-d', '3'])
+            cmdline.extend(['-t', target_path])
             cmdline.extend(['-g'] + atlas_img_path_list)
-            cmdline.extend(['-tg', target_path])
             cmdline.extend(['-l'] + atlas_lab_path_list)
-            cmdline.extend(['-m', 'Joint'])
-            if patch_rad is not None: cmdline.extend(['-rp', patch_rad])
-            if search_rad is not None: cmdline.extend(['-rs', search_rad])
-            if probabilities:
+            # cmdline.extend(['-m', 'Joint'])
+            if patch_rad is not None: cmdline.extend(['-p', patch_rad])
+            if search_rad is not None: cmdline.extend(['-s', search_rad])
+            # if probabilities:
                 # if not os.path.exists(target_tmp_dir): os.makedirs(target_tmp_dir)
-                cmdline.extend(['-p', prob_path])
-            cmdline.append(out_file)
+                # cmdline.extend(['-p', prob_path])
+            aux = target_path.split('_t2.nii.gz')[0] + '_OBVMask.nii.gz'
+            cmdline.extend(['-x', aux])
+
+            cmdline.extend(['-o', out_file])
 
         elif method == 'majvot':
 
@@ -472,6 +476,7 @@ if __name__ == "__main__":
                 cmdline += ['--out_dir', target_reg_dir]
                 cmdline += ['--out_suffix', 'Warped.nii.gz']
                 cmdline += ['--float']
+                cmdline += ['--num_procs', '%d' % args.num_procs[0]]
 
                 print "Warping atlases to target {}".format(target_img_files[i_t])
 

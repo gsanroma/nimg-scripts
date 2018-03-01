@@ -16,11 +16,11 @@ parser.add_argument("--gtr_suffix", type=str, nargs=1, required=True, help="Suff
 parser.add_argument("--per_subject_dice", action='store_true', help="keep per per subject dices")
 parser.add_argument("--num_procs", type=int, nargs=1, default=[30], help="Number of concurrent processess")
 
-# args = parser.parse_args()
-args = parser.parse_args('--est_dir /home/sanromag/DATA/WMH/BIANCA/shahid_run '
-                         '--est_suffix _t95.nii.gz '
-                         '--gtr_dir /home/sanromag/DATA/WMH/RS/data_proc '
-                         '--gtr_suffix _WMHmaskbin.nii.gz '.split())
+args = parser.parse_args()
+# args = parser.parse_args('--est_dir /home/sanromag/DATA/WMH/BIANCA/shahid_run '
+#                          '--est_suffix _t95.nii.gz '
+#                          '--gtr_dir /home/sanromag/DATA/WMH/RS/data_proc '
+#                          '--gtr_suffix _WMHmaskbin.nii.gz '.split())
 
 #
 # Retrieve estimated files
