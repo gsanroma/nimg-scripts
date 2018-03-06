@@ -30,7 +30,7 @@ pblf_path = os.path.join(code_dir, 'utils', 'pblf.py')
 # # In case joining labels, need to set job_id to the joining job
 
 def label_fusion(launcher, target_path, atlas_img_path_list, atlas_lab_path_list, out_file, probabilities, method, metric,
-                 patch_rad=None, search_rad=None, fusion_rad=None, struct_sim=None, patch_norm=None,
+                 target_mask_path=None, patch_rad=None, search_rad=None, fusion_rad=None, struct_sim=None, patch_norm=None,
                  params_list=None, parallel_label_superlist=None, num_itk_threads=None, target_lab_4_metrics=None):
 
     out_dir = os.path.dirname(out_file)
@@ -51,15 +51,16 @@ def label_fusion(launcher, target_path, atlas_img_path_list, atlas_lab_path_list
             cmdline.extend(['-t', target_path])
             cmdline.extend(['-g'] + atlas_img_path_list)
             cmdline.extend(['-l'] + atlas_lab_path_list)
+
+            if target_mask_path is not None:
+                cmdline.extend(['-x', target_mask_path])
+
             # cmdline.extend(['-m', 'Joint'])
             if patch_rad is not None: cmdline.extend(['-p', patch_rad])
             if search_rad is not None: cmdline.extend(['-s', search_rad])
             # if probabilities:
                 # if not os.path.exists(target_tmp_dir): os.makedirs(target_tmp_dir)
                 # cmdline.extend(['-p', prob_path])
-            aux = target_path.split('_t2.nii.gz')[0] + '_OBVMask.nii.gz'
-            cmdline.extend(['-x', aux])
-
             cmdline.extend(['-o', out_file])
 
         elif method == 'majvot':
@@ -180,13 +181,17 @@ def atlas_selection(args_atsel, target_names, atlas_names, is_loo=False):
     return np.argsort(scores, axis=1)[:, :-int(args_atsel[0]) - 1:-1]
 
 
-def get_label_fusion_params(target_dir, target_img_suffix, reg_dir=None, reg_img_suffix=None, reg_lab_suffix=None, args_atsel=None):
+def get_label_fusion_params(target_dir, target_img_suffix, target_mask_suffix=None, reg_dir=None, reg_img_suffix=None, reg_lab_suffix=None, args_atsel=None):
 
     files = os.listdir(target_dir)
     target_img_list = [f for f in files if f.endswith(target_img_suffix)]
     target_name_list = [f.split(target_img_suffix)[0] for f in target_img_list]
     target_path_list = [os.path.join(target_dir, f) for f in target_img_list]
     assert target_img_list, 'No target image found'
+
+    target_mask_list = None
+    if target_mask_suffix is not None:
+        target_mask_list = [f.split(target_img_suffix)[0] + target_mask_suffix for f in target_img_list]
 
     atlas_dir_list = [os.path.join(reg_dir, f.split(target_img_suffix)[0]) for f in target_img_list]
     atlas_img_path_superlist, atlas_lab_path_superlist = [], []
@@ -206,7 +211,7 @@ def get_label_fusion_params(target_dir, target_img_suffix, reg_dir=None, reg_img
         atlas_img_path_superlist.append(atlas_img_path_list)
         atlas_lab_path_superlist.append(atlas_lab_path_list)
 
-    return (target_name_list, target_path_list, atlas_img_path_superlist, atlas_lab_path_superlist)
+    return (target_name_list, target_path_list, atlas_img_path_superlist, atlas_lab_path_superlist, target_mask_list)
 
 
 if __name__ == "__main__":
@@ -219,6 +224,7 @@ if __name__ == "__main__":
     parser.add_argument("--target_dir", type=str, nargs=1, required=True, help='directory of target images')
     parser.add_argument("--target_img_suffix", type=str, nargs=1, required=True, help='image suffixes')
     parser.add_argument("--target_lab_suffix", type=str, nargs=1, help="(optional) in case leave-one-out label fusion")
+    parser.add_argument("--target_mask_suffix", type=str, nargs=1, help="(optional) suffix of mask where to perform label fusion")
 
     parser.add_argument("--labfus_dir", type=str, nargs=1, help='(optional) directory to store label fusion results')
 
@@ -298,9 +304,13 @@ if __name__ == "__main__":
 
         # if want to use existing regdir -> gather filenames
 
-        aux = get_label_fusion_params(args.target_dir[0], args.target_img_suffix[0], args.out_reg_dir[0],
+        target_mask_suffix = None
+        if args.target_mask_suffix is not None:
+            target_mask_suffix = args.target_mask_suffix[0]
+
+        aux = get_label_fusion_params(args.target_dir[0], args.target_img_suffix[0], target_mask_suffix, args.out_reg_dir[0],
                                       args.reg_img_suffix[0], args.reg_lab_suffix[0], args.atlas_selection)
-        target_name_list, target_path_list, atlas_img_path_superlist, atlas_lab_path_superlist = aux
+        target_name_list, target_path_list, atlas_img_path_superlist, atlas_lab_path_superlist, target_mask_files = aux
         Ntar = len(target_name_list)
 
         # print('NUMBER OF TARGETS %d' % (Ntar))
@@ -322,6 +332,10 @@ if __name__ == "__main__":
         if args.target_lab_suffix is not None:
             target_lab_files = [f.split(args.target_img_suffix[0])[0] + args.target_lab_suffix[0] for f in target_img_files]
             assert False not in [os.path.exists(os.path.join(args.target_dir[0], f)) for f in target_lab_files], "Some target label file not found"
+
+        if args.target_mask_suffix is not None:
+            target_mask_files = [f.split(args.target_img_suffix[0])[0] + args.target_mask_suffix[0] for f in target_img_files]
+            assert False not in [os.path.exists(os.path.join(args.target_dir[0], f)) for f in target_mask_files], "Some target mask file not found"
 
         is_loo = False
         if args.atlas_dir is not None:
@@ -439,6 +453,10 @@ if __name__ == "__main__":
             atlas_img_path_list = atlas_img_path_superlist[i_t]
             atlas_lab_path_list = atlas_lab_path_superlist[i_t]
 
+            target_mask_path = None
+            if args.target_mask_suffix is not None:
+                target_mask_path = os.path.join(args.target_dir[0], target_mask_files[i_t])
+
         else:
 
             target_name = target_img_files[i_t].split(args.target_img_suffix[0])[0]
@@ -486,11 +504,19 @@ if __name__ == "__main__":
                 atlas_img_path_list = [os.path.join(target_reg_dir, atlas_img_files[i_a].split(os.extsep, 1)[0] + 'Warped.nii.gz') for i_a in atlas_idx[i_t]]
                 atlas_lab_path_list = [os.path.join(target_reg_dir, atlas_lab_files[i_a].split(os.extsep, 1)[0] + 'Warped.nii.gz') for i_a in atlas_idx[i_t]]
 
+                target_mask_path = None
+                if args.target_mask_suffix is not None:
+                    target_mask_path = os.path.join(args.target_dir[0], target_mask_files[i_t])
+
             else:
 
                 target_path = os.path.join(args.out_reg_dir[0], target_img_files[i_t].split(os.extsep, 1)[0] + 'Warped.nii.gz')
                 atlas_img_path_list = [os.path.join(args.out_reg_dir[0], atlas_img_files[i_a].split(os.extsep, 1)[0] + 'Warped.nii.gz') for i_a in atlas_idx[i_t]]
                 atlas_lab_path_list = [os.path.join(args.out_reg_dir[0], atlas_lab_files[i_a].split(os.extsep, 1)[0] + 'Warped.nii.gz') for i_a in atlas_idx[i_t]]
+
+                target_mask_path = None
+                if args.target_mask_suffix is not None:
+                    target_mask_path = os.path.join(args.target_dir[0], target_mask_files[i_t])
 
         #
         # Label fusion
@@ -526,7 +552,7 @@ if __name__ == "__main__":
                     struct_sim = args.struct_sim[0] if args.struct_sim is not None else None
                     patch_norm = args.patch_norm[0] if args.patch_norm is not None else None
 
-                    launcher = label_fusion(launcher, target_path, atlas_img_path_list, atlas_lab_path_list, out_file, args.probabilities, method, args.metric[0],
+                    launcher = label_fusion(launcher, target_path, atlas_img_path_list, atlas_lab_path_list, out_file, args.probabilities, method, args.metric[0], target_mask_path,
                                             patch_rad, search_rad, fusion_rad, struct_sim, patch_norm, params_list, args.parallel_labels_list, args.num_itk_threads[0])
 
             if not args.target_parallelism:
