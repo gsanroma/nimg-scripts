@@ -3,7 +3,7 @@ __author__ = 'gsanroma'
 import argparse
 import os
 import csv
-from scheduler import Launcher, check_file_repeat
+import sys
 from shutil import rmtree, move
 
 parser = argparse.ArgumentParser(description='Computes Dice score of estimated segmentations w.r.t. ground truth segmentations.\n'
@@ -21,6 +21,10 @@ args = parser.parse_args()
 #                          '--est_suffix _t95.nii.gz '
 #                          '--gtr_dir /home/sanromag/DATA/WMH/RS/data_proc '
 #                          '--gtr_suffix _WMHmaskbin.nii.gz '.split())
+
+# start launcher and specify max amount of processes
+sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'modules'))
+from scheduler import Launcher, check_file_repeat
 
 #
 # Retrieve estimated files
