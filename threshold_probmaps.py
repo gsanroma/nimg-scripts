@@ -10,12 +10,12 @@ parser.add_argument("--out_dir", type=str, nargs=1, help='output directory (same
 parser.add_argument("--out_suffix_list", type=str, nargs='+', required=True, help='list of suffixes of output thresholded labelmap files')
 parser.add_argument("--threshold_list", type=float, nargs='+', required=True, help="List of thresholds")
 
-# args = parser.parse_args()
-args = parser.parse_args('--in_dir /home/sanromag/DATA/WMH/train_RS/kk '
-                         '--in_suffix _brainmaskWarped.nii.gz '
-                         '--out_dir /home/sanromag/DATA/WMH/train_RS/kk '
-                         '--out_suffix_list _brainmaskWarped.nii.gz '
-                         '--threshold_list 0.1 '.split())
+args = parser.parse_args()
+# args = parser.parse_args('--in_dir /home/sanromag/DATA/WMH/train_RS/kk '
+#                          '--in_suffix _brainmaskWarped.nii.gz '
+#                          '--out_dir /home/sanromag/DATA/WMH/train_RS/kk '
+#                          '--out_suffix_list _brainmaskWarped.nii.gz '
+#                          '--threshold_list 0.1 '.split())
 
 assert len(args.out_suffix_list) == len(args.threshold_list), "same number of thresholds as suffixes should be given"
 
