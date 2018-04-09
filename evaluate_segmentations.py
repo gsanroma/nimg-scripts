@@ -3,8 +3,13 @@ __author__ = 'gsanroma'
 import argparse
 import os
 import csv
+<<<<<<< HEAD
+# from scheduler import Launcher, check_file_repeat
+=======
 import sys
+>>>>>>> eefeebe847ffbe635f65b26f25d61ec1c6e5880d
 from shutil import rmtree, move
+import sys
 
 parser = argparse.ArgumentParser(description='Computes Dice score of estimated segmentations w.r.t. ground truth segmentations.\n'
                                              'Average per-label Dice score and average per-subject Dice score are stored in \n'
@@ -27,6 +32,10 @@ sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'modules'))
 from scheduler import Launcher, check_file_repeat
 
 #
+# start launcher and specify max amount of processes
+sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'modules'))
+from scheduler import Launcher
+
 # Retrieve estimated files
 
 files_list = os.listdir(args.est_dir[0])
@@ -38,6 +47,8 @@ assert est_files, "No estimated segmentation found"
 # Retrieve ground truth files
 
 gtr_files = [f + args.gtr_suffix[0] for f in est_names]
+# print('GTR FILES: %s' % gtr_files)
+# print('FOUND: %s' % [os.path.exists(os.path.join(args.gtr_dir[0], f)) for f in gtr_files])
 assert not False in [os.path.exists(os.path.join(args.gtr_dir[0], f)) for f in gtr_files], "Some ground-truth segmentations not found"
 
 Nimg = len(est_files)
