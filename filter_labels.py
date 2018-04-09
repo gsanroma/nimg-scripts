@@ -9,19 +9,20 @@ parser.add_argument("--in_suffix", type=str, nargs=1, required=True, help='suffi
 parser.add_argument("--out_dir", type=str, nargs=1, required=True, help='output directory')
 parser.add_argument("--out_suffix", type=str, nargs=1, required=True, help='suffix of output filtered files')
 parser.add_argument("--include", type=int, nargs='+', action="append", help="label id or list ids (if list, group using 1st id)")
+parser.add_argument("--include_range", type=int, nargs=2, help="min and max of range of label ids to keep (grouped using min)")
 parser.add_argument("--keep_ids", action="store_true", help="keep label ids of original labels (rather than grouping them using the 1st id)")
 parser.add_argument("--map", type=int, nargs=2, action="append", help="map 1st label id to the 2nd (after filtering, if applicable)")
+parser.add_argument("--fixed_id", type=int, nargs=1, help="assign a fixed id to all labels")
 
 args = parser.parse_args()
-# args = parser.parse_args('--in_dir /home/sanromag/DATA/WMH/test_RS/subj '
-#                          '--in_suffix _aseg.nii.gz '
-#                          '--out_dir /home/sanromag/DATA/WMH/test_RS/subj '
-#                          # '--out_suffix _vent.nii.gz '
-#                          # '--include 43 4 '
-#                          '--out_suffix _co.nii.gz '
-#                          '--include 42 3 '
-#                          '--map 42 1 '.split())
-
+# args = parser.parse_args(''
+#                          '--in_dir /home/sanromag/DATA/tmp '
+#                          '--in_suffix _FSwmparc.nii.gz '
+#                          '--out_dir /home/sanromag/DATA/tmp '
+#                          '--out_suffix _filtered.nii.gz '
+#                          '--include_range 3000 4999 '
+#                          '--keep_ids '
+#                          ''.split())
 
 files_list = os.listdir(args.in_dir[0])
 in_files_list = [f for f in files_list if f.endswith(args.in_suffix[0])]
@@ -39,15 +40,27 @@ for in_file, out_file in zip(in_files_list, out_files_list):
 
     out0 = np.zeros(in0.shape, dtype=in0.dtype)
 
-    for labels in args.include:
-        for label in labels:
-            value = label if args.keep_ids else labels[0]
-            out0[np.where(in0 == label)] = value
+    if args.include is not None:
+        for labels in args.include:
+            for label in labels:
+                value = labels[0]
+                if args.keep_ids: value = label
+                if args.fixed_id is not None: value = args.fixed_id[0]
+                out0[in0 == label] = value
 
-    if args.map:
+    elif args.include_range is not None:
+        selection_mask = np.logical_and(in0 >= args.include_range[0], in0 <= args.include_range[1])
+        if args.fixed_id is not None:
+            out0[selection_mask] = args.fixed_id[0]
+        elif args.keep_ids:
+            out0[selection_mask] = in0[selection_mask]
+        else:
+            out0[selection_mask] = args.include_range[0]
+
+    if args.map is not None:
         out1 = np.copy(out0)
         for map_pair in args.map:
-            out1[np.where(out0 == map_pair[0])] = map_pair[1]
+            out1[out0 == map_pair[0]] = map_pair[1]
 
     out_final = out0 if not args.map else out1
     out_nib = nib.Nifti1Image(out_final, in_nib.affine, in_nib.header)
