@@ -3,11 +3,6 @@ __author__ = 'gsanroma'
 import argparse
 import os
 import csv
-<<<<<<< HEAD
-# from scheduler import Launcher, check_file_repeat
-=======
-import sys
->>>>>>> eefeebe847ffbe635f65b26f25d61ec1c6e5880d
 from shutil import rmtree, move
 import sys
 
