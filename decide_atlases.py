@@ -21,7 +21,8 @@ import matplotlib.pyplot as plt
 #
 
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser('Selects one (or multiple) sets of images evenly spread accross the population according to some similarity metric.'
+                                 'Useful to select train (atlases) and test (target) sets for cross-validation.')
 parser.add_argument("--scores_file", type=str, nargs=1, required=True)
 parser.add_argument("--use_subset", type=str, nargs=3, help='(optional) img_dir, img_suffix, scores_img_suffix. Use subset of files')
 parser.add_argument("--num_folds", type=int, nargs=1, help="(optional) number of folds")

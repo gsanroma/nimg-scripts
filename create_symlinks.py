@@ -2,7 +2,7 @@ import os
 import argparse
 import sys
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser('Creates symbolic links of the files from one directory onto another')
 parser.add_argument("--filenames_dir", type=str, nargs=1, required=True, help='Directory where to get prefixes of filenames to be linked')
 parser.add_argument("--filenames_suffix", type=str, nargs=1, required=True, help='Suffix to be removed from filenames to get prefixes')
 parser.add_argument("--source_dir", type=str, nargs=1, required=True, help="Source directory to link filenames from (starting with obtained prefixes)")

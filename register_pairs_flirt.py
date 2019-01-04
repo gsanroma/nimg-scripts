@@ -2,7 +2,7 @@ import argparse
 import os
 import sys
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser('Register pairs of images (eg, baseline and follow-up) using FSL flirt')
 parser.add_argument("--ref_dir", type=str, nargs=1, required=True, help="Directory containing the reference images")
 parser.add_argument("--ref_suffix", type=str, nargs=1, required=True, help="Suffix of reference images")
 parser.add_argument("--mov_dir", type=str, nargs=1, required=True, help="Directory containing the moving images")

@@ -8,7 +8,7 @@ from scipy.spatial.distance import correlation, dice
 from pickle import dump
 from joblib import Parallel, delayed
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser('Computes the similarity between images according to some metric')
 parser.add_argument("--in_dir", type=str, nargs=1, required=True)
 parser.add_argument("--in_suffix", type=str, nargs=1, required=True)
 parser.add_argument("--in2_dir", type=str, nargs=1, help="(optional) if not given, LOO in in_dir is used")

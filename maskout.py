@@ -5,7 +5,7 @@ import sys
 import argparse
 from joblib import Parallel, delayed
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser('Masks-out images given a mask')
 parser.add_argument("--in_dir", type=str, nargs=1, required=True, help='input directory')
 parser.add_argument("--in_suffix_list", type=str, nargs='+', required=True, help='list of suffixes of images to maskout')
 parser.add_argument("--mask_suffix", type=str, nargs=1, help='suffix of mask files (in case each file with its own mask)')
