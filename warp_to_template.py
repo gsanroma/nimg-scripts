@@ -11,7 +11,8 @@ parser.add_argument("--reg_dir", type=str, nargs=1, required=True, help='directo
 parser.add_argument("--in_linear_intfix", type=str, nargs=1, required=True, help="intfix of the input linear transform")
 parser.add_argument("--in_deform_intfix", type=str, nargs=1, help="(optional) intfix of the input deformation field")
 parser.add_argument("--out_dir", type=str, nargs=1, required=True, help='output directory')
-parser.add_argument("--out_suffix", type=str, nargs=1, required=True, help="suffix to be added to the filename without extension")
+parser.add_argument("--out_suffix", type=str, nargs=1, required=True, help="suffix to be added to the filename")
+parser.add_argument("--only_substitute_ext", action="store_true")
 parser.add_argument("--inverse", type=str, nargs='*', help="(optional) [ no args : template -> subjects | dir_native suffix : template space -> native space ] (beware of interpolation trick!)")
 parser.add_argument("--float", action="store_true")
 parser.add_argument("--num_procs", type=int, nargs=1, default=[8], help='number of concurrent processes ')
@@ -96,7 +97,8 @@ for files_list, suffix, interpolation in zip(linear_superlist, args.linear_suffi
             if args.in_deform_intfix is not None:
                 cmdline += ['--transform', os.path.join(args.reg_dir[0], file_name + args.in_deform_intfix[0] + '1InverseWarp.nii.gz')]
 
-        cmdline += ['--output', os.path.join(args.out_dir[0], file.split('.nii.gz')[0] + args.out_suffix[0])]
+        aux_suffix = '.nii.gz' if args.only_substitute_ext else suffix[0]
+        cmdline += ['--output', os.path.join(args.out_dir[0], file.split(aux_suffix)[0] + args.out_suffix[0])]
 
 
         #

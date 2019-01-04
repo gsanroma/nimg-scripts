@@ -2,6 +2,7 @@ import argparse
 import os
 import numpy as np
 import nibabel as nib
+from joblib import Parallel, delayed
 
 parser = argparse.ArgumentParser(description='Selects a subset of labels from list of labelmaps')
 parser.add_argument("--in_dir", type=str, nargs=1, required=True, help='input directory')
@@ -13,6 +14,7 @@ parser.add_argument("--include_range", type=int, nargs=2, help="min and max of r
 parser.add_argument("--keep_ids", action="store_true", help="keep label ids of original labels (rather than grouping them using the 1st id)")
 parser.add_argument("--map", type=int, nargs=2, action="append", help="map 1st label id to the 2nd (after filtering, if applicable)")
 parser.add_argument("--fixed_id", type=int, nargs=1, help="assign a fixed id to all labels")
+parser.add_argument("--num_procs", type=int, nargs=1, default=[8], help='number of concurrent processes ')
 
 args = parser.parse_args()
 # args = parser.parse_args(''
@@ -30,11 +32,25 @@ assert in_files_list, "List of input labels is empty"
 
 out_files_list = [f.split(args.in_suffix[0])[0] + args.out_suffix[0] for f in in_files_list]
 
-for in_file, out_file in zip(in_files_list, out_files_list):
+# create output directory
+if not os.path.exists(args.out_dir[0]):
+    os.makedirs(args.out_dir[0])
 
-    print("Processing %s" % in_file)
+def filt_lab(in_path, out_path, args):
+    """Filters labels
 
-    in_nib = nib.load(os.path.join(args.in_dir[0], in_file))
+    Parameters
+    ----------
+    in_path : string
+        path of the input file
+    out_path : string
+        path of the output file
+    """
+# for in_file, out_file in zip(in_files_list, out_files_list):
+
+    print("Processing %s" % os.path.basename(in_path))
+
+    in_nib = nib.load(in_path)
 
     in0 = in_nib.get_data()
 
@@ -64,6 +80,8 @@ for in_file, out_file in zip(in_files_list, out_files_list):
 
     out_final = out0 if not args.map else out1
     out_nib = nib.Nifti1Image(out_final, in_nib.affine, in_nib.header)
-    nib.save(out_nib, os.path.join(args.out_dir[0], out_file))
+    nib.save(out_nib, out_path)
 
+
+Parallel(n_jobs=args.num_procs[0])(delayed(filt_lab)(os.path.join(args.in_dir[0], in_file), os.path.join(args.out_dir[0], out_file), args) for in_file, out_file in zip(in_files_list, out_files_list))
 

@@ -18,7 +18,9 @@ from scheduler import Launcher
 code_dir = os.path.join(os.environ['HOME'], 'CODE')
 warptotemplate_path = os.path.join(code_dir, 'utils', 'warp_to_template.py')
 warpatlasestotarget_path = os.path.join(code_dir, 'utils', 'warp_atlases_to_target.py')
+maskout_path = os.path.join(code_dir, 'utils', 'maskout.py')
 imagemath_path = os.path.join(os.environ['ANTSPATH'], 'ImageMath')
+# imagemath_path = os.path.join('home', 'sanromag', 'Programs', 'ANTs', 'build', 'bin', 'ImageMath')
 pblf_path = os.path.join(code_dir, 'utils', 'pblf.py')
 
 
@@ -31,7 +33,8 @@ pblf_path = os.path.join(code_dir, 'utils', 'pblf.py')
 
 def label_fusion(launcher, target_path, atlas_img_path_list, atlas_lab_path_list, out_file, probabilities, method, metric,
                  target_mask_path=None, patch_rad=None, search_rad=None, fusion_rad=None, struct_sim=None, patch_norm=None,
-                 params_list=None, parallel_label_superlist=None, num_itk_threads=None, target_lab_4_metrics=None):
+                 params_list=None, joint_alpha=None, joint_beta=None, joint_metric=None, parallel_label_superlist=None,
+                 num_itk_threads=None, target_lab_4_metrics=None):
 
     out_dir = os.path.dirname(out_file)
     out_name = os.path.basename(out_file).split(os.extsep, 1)[0]
@@ -58,6 +61,11 @@ def label_fusion(launcher, target_path, atlas_img_path_list, atlas_lab_path_list
             # cmdline.extend(['-m', 'Joint'])
             if patch_rad is not None: cmdline.extend(['-p', patch_rad])
             if search_rad is not None: cmdline.extend(['-s', search_rad])
+
+            if joint_alpha is not None: cmdline.extend(['-a', '%f' % joint_alpha])
+            if joint_beta is not None: cmdline.extend(['-b', '%f' % joint_beta])
+            if joint_metric is not None: cmdline.extend(['-m', joint_metric])
+
             # if probabilities:
                 # if not os.path.exists(target_tmp_dir): os.makedirs(target_tmp_dir)
                 # cmdline.extend(['-p', prob_path])
@@ -206,8 +214,23 @@ def get_label_fusion_params(target_dir, target_img_suffix, target_mask_suffix=No
         # print('atlas dir: %s, atlas idx %s' % (atlas_dir, atlas_idx))
         # print('atlas_name_list: %s' % atlas_name_list)
         atlas_img_path_list = [os.path.join(atlas_dir, atlas_img_list[j]) for j in atlas_idx]
-        atlas_lab_path_list = [os.path.join(atlas_dir, atlas_img_list[j]).split(reg_img_suffix)[0] + reg_lab_suffix for j in atlas_idx]
-        assert False not in [os.path.exists(f) for f in atlas_lab_path_list]
+        atlas_lab_path_list = [os.path.join(atlas_dir, atlas_name_list[j]) + reg_lab_suffix for j in atlas_idx]
+
+
+        #
+        #
+        # assert False not in [os.path.exists(f) for f in atlas_lab_path_list]
+        # THIS IS TO AVOID THE SCRIPT STOPPING BECAUSE ONE STUPID LABEL FILE DID NOT WARP, but should be checked what happened
+        idx_list = [j for j, f in enumerate(atlas_lab_path_list) if not os.path.exists(f)]
+        for idx in sorted(idx_list, reverse=True):
+            print '****** LABEL FOR %s DOES NOT EXIST ****** ' % atlas_img_path_list[idx]
+            del atlas_img_path_list[idx]
+            del atlas_lab_path_list[idx]
+        #
+        #
+        #
+
+
         atlas_img_path_superlist.append(atlas_img_path_list)
         atlas_lab_path_superlist.append(atlas_lab_path_list)
 
@@ -232,6 +255,7 @@ if __name__ == "__main__":
                                                                      "suffix inside scores file for target, idem for atlas")
 
     parser.add_argument("--out_reg_dir", type=str, nargs=1, required=True, help='registrations directory')
+    parser.add_argument("--num_procs", type=int, nargs=1, default=[8], help='number of concurrent processes ')
 
     # ONLY IF OUT_REG_DIR EXISTS
     parser.add_argument("--reg_img_suffix", type=str, nargs=1, help='if out_reg_dir exists, suffix of warped img files')
@@ -252,11 +276,12 @@ if __name__ == "__main__":
 
     parser.add_argument("--template_file", type=str, nargs=1, help="(optional) do label fusion in template space")
     parser.add_argument("--keep_reg_dir", action="store_true", help='keep temp directory (for debug)')
+    parser.add_argument("--maskout_reg_files", action="store_true", help='maskout registered images with target_mask (to save space)')
 
     # LABFUS ARGUMENTS
     parser.add_argument("--target_parallelism", action="store_true", help="parallelize label fusion along target images (faster but takes more disk space) (use only when small number of targets/atlases)")
     parser.add_argument("--probabilities", action="store_true", help="compute segmentation probabilities")
-    parser.add_argument("--num_procs", type=int, nargs=1, default=[8], help='number of concurrent processes ')
+    parser.add_argument("--float", action="store_true", help='use single precision computations')
     parser.add_argument("--num_itk_threads", type=int, nargs=1, default=[1], help='number of threads per ANTs proc ')
 
     parser.add_argument("--patch_rad", type=str, nargs=1, help="patch radius #x#x# (joint, nlwv, lasso, nlbeta, deeplf)")
@@ -283,12 +308,34 @@ if __name__ == "__main__":
     parser.add_argument("--myjoint_h_list", type=float, nargs='+', default=[3.0], help="param (myjoint)")
 
     parser.add_argument("--joint_suffix", type=str, nargs=1, help="joint suffix to be added to the target image name without target_img_suffix")
+    parser.add_argument("--joint_alpha", type=float, nargs=1, help="value for alpha in joint label fusion")
+    parser.add_argument("--joint_beta", type=float, nargs=1, help="value for alpha in joint label fusion")
+    parser.add_argument("--joint_metric", type=str, nargs=1, help="similarity metric in joint label fusion: PC (pearson, default), MSQ (mean squares)")
+
     parser.add_argument("--majvot_suffix", type=str, nargs=1, help="majvot suffix to be added to the target image name without target_img_suffix")
     # parser.add_argument("--staple_suffix", type=str, nargs=1, help="staple suffix to be added to the target image name without target_img_suffix")
 
     parser.add_argument("--parallel_labels_list", action='append', type=int, nargs='+', help="(append) list of labels to be paired with parameter list")
 
     args = parser.parse_args()
+    # args = parser.parse_args('--target_dir /home/sanromag/DATA/OB/data_partitions/kk/ '
+    #                          '--target_img_suffix _t2.nii.gz '
+    #                          '--target_lab_suffix _OBV.nii.gz '
+    #                          '--target_mask_suffix _mask.nii.gz '
+    #                          '--atlas_selection 15 /home/sanromag/DATA/OB/templates/NormCorr_S3mXtpl.dat _t2_S3mXtpl_Warped.nii.gz _t2_S3mXtpl_Warped.nii.gz '
+    #                          '--out_reg_dir /home/sanromag/DATA/OB/data_partitions/reg_S3m '
+    #                          '--reg_img_suffix _t2Warped.nii.gz '
+    #                          '--reg_lab_suffix _OBVWarped.nii.gz '
+    #                          '--keep_reg_dir '
+    #                          '--num_procs 5 '
+    #                          '--target_parallelism '
+    #                          '--float '
+    #                          '--patch_rad 2x2x2 '
+    #                          '--search_rad 1x1x1 '
+    #                          '--joint_suffix _joint.nii.gz '
+    #                          '--joint_alpha 1e-7 '
+    #                          '--joint_beta 4.0 '
+    #                          '--labfus_dir /home/sanromag/DATA/OB/labfus/kk '.split())
 
 
     # Check if reg dir exists
@@ -355,7 +402,7 @@ if __name__ == "__main__":
             Natl = len(atlas_img_files)
         else:
             print "Leave one out segmentation"
-            print('target images: %s' % (target_img_files))
+            # print('target images: %s' % (target_img_files))
             is_loo = True
             atlas_img_files = target_img_files
             atlas_lab_files = target_lab_files
@@ -409,7 +456,8 @@ if __name__ == "__main__":
                 cmdline += ['--in_deform_intfix', args.target_deform_intfix[0]]
             cmdline += ['--out_dir', args.out_reg_dir[0]]
             cmdline += ['--out_suffix', 'Warped.nii.gz']
-            cmdline += ['--float']
+            if args.float: cmdline += ['--float']
+            cmdline += ['--num_procs', '%d' % args.num_procs[0]]
 
             print "Warping targets to template"
 
@@ -428,7 +476,8 @@ if __name__ == "__main__":
                     cmdline += ['--in_deform_intfix', atlas_deform_intfix]
                 cmdline += ['--out_dir', args.out_reg_dir[0]]
                 cmdline += ['--out_suffix', 'Warped.nii.gz']
-                cmdline += ['--float']
+                if args.float: cmdline += ['--float']
+                cmdline += ['--num_procs', '%d' % args.num_procs[0]]
 
                 print "Warping atlases to template"
 
@@ -481,10 +530,8 @@ if __name__ == "__main__":
                 cmdline += ['--atlas_nearest_suffix', atlas_lab_suffix]
                 cmdline += ['--atlas_reg_dir', atlas_reg_dir]
                 cmdline += ['--atlas_linear_intfix', atlas_linear_intfix]
-                try:
+                if atlas_deform_intfix is not None:
                     cmdline += ['--atlas_deform_intfix', atlas_deform_intfix]
-                except:
-                    pass
                 cmdline += ['--target_file', os.path.join(args.target_dir[0], target_img_files[i_t])]
                 cmdline += ['--target_suffix', args.target_img_suffix[0]]
                 cmdline += ['--target_reg_dir', args.target_reg_dir[0]]
@@ -493,7 +540,7 @@ if __name__ == "__main__":
                     cmdline += ['--target_deform_intfix', args.target_deform_intfix[0]]
                 cmdline += ['--out_dir', target_reg_dir]
                 cmdline += ['--out_suffix', 'Warped.nii.gz']
-                cmdline += ['--float']
+                if args.float: cmdline += ['--float']
                 cmdline += ['--num_procs', '%d' % args.num_procs[0]]
 
                 print "Warping atlases to target {}".format(target_img_files[i_t])
@@ -507,6 +554,19 @@ if __name__ == "__main__":
                 target_mask_path = None
                 if args.target_mask_suffix is not None:
                     target_mask_path = os.path.join(args.target_dir[0], target_mask_files[i_t])
+
+                    # If there's target mask offer the option of masking out atlases to save space
+                    if args.maskout_reg_files:
+                        cmdline = ['python', '-u', maskout_path]
+                        cmdline += ['--in_dir', target_reg_dir]
+                        cmdline += ['--in_suffix_list', atlas_img_suffix.split(os.extsep, 1)[0] + 'Warped.nii.gz']
+                        cmdline += ['--mask_file', target_mask_path]
+                        cmdline += ['--num_procs', '%d' % args.num_procs[0]]
+
+                        print "Masking out atlases of target {}".format(target_img_files[i_t])
+
+                        call(cmdline)
+
 
             else:
 
@@ -552,8 +612,13 @@ if __name__ == "__main__":
                     struct_sim = args.struct_sim[0] if args.struct_sim is not None else None
                     patch_norm = args.patch_norm[0] if args.patch_norm is not None else None
 
+                    joint_alpha = args.joint_alpha[0] if args.joint_alpha is not None else None
+                    joint_beta = args.joint_beta[0] if args.joint_beta is not None else None
+                    joint_metric = args.joint_metric[0] if args.joint_metric is not None else None
+
                     launcher = label_fusion(launcher, target_path, atlas_img_path_list, atlas_lab_path_list, out_file, args.probabilities, method, args.metric[0], target_mask_path,
-                                            patch_rad, search_rad, fusion_rad, struct_sim, patch_norm, params_list, args.parallel_labels_list, args.num_itk_threads[0])
+                                            patch_rad, search_rad, fusion_rad, struct_sim, patch_norm, params_list, joint_alpha, joint_beta, joint_metric,
+                                            args.parallel_labels_list, args.num_itk_threads[0])
 
             if not args.target_parallelism:
                 launcher.wait()
