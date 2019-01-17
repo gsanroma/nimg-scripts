@@ -19,7 +19,7 @@ parser.add_argument("--num_procs", type=int, nargs=1, default=[8], help='number 
 
 args = parser.parse_args()
 
-sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'modules'))
+sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'src', 'modules'))
 from scheduler import Launcher
 
 launcher = Launcher(args.num_procs[0])

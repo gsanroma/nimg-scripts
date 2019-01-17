@@ -8,20 +8,20 @@ import sys
 from shutil import rmtree
 from copy import copy
 
-sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'modules'))
+sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'src', 'modules'))
 from scheduler import Launcher
 
 #
 # PATHS
 #
 
-code_dir = os.path.join(os.environ['HOME'], 'CODE')
-warptotemplate_path = os.path.join(code_dir, 'utils', 'warp_to_template.py')
-warpatlasestotarget_path = os.path.join(code_dir, 'utils', 'warp_atlases_to_target.py')
-maskout_path = os.path.join(code_dir, 'utils', 'maskout.py')
+code_dir = os.path.join(os.environ['HOME'], 'CODE', 'src')
+warptotemplate_path = os.path.join(code_dir, 'nimg-scripts', 'warp_to_template.py')
+warpatlasestotarget_path = os.path.join(code_dir, 'nimg-scripts', 'warp_atlases_to_target.py')
+maskout_path = os.path.join(code_dir, 'nimg-scripts', 'maskout.py')
 imagemath_path = os.path.join(os.environ['ANTSPATH'], 'ImageMath')
 # imagemath_path = os.path.join('home', 'sanromag', 'Programs', 'ANTs', 'build', 'bin', 'ImageMath')
-pblf_path = os.path.join(code_dir, 'utils', 'pblf.py')
+pblf_path = os.path.join(code_dir, 'nimg-scripts', 'pblf.py')
 
 
 #
