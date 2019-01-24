@@ -12,13 +12,14 @@ parser.add_argument("--template_file", type=str, nargs=1, help="(optional) templ
 parser.add_argument("--out_dir", type=str, nargs=1, help="dir of output mask (in case of multiple masks). Default: same as in_dir")
 parser.add_argument("--out_suffix_or_mask_file", type=str, nargs=1, required=True, help="output suffix (multiple masks) or mask file (single mask)")
 parser.add_argument("--dilation_radius", type=str, nargs=1, default=['1x1x1'], help="(optional) dilation radius (eg, 1x1x1)")
+parser.add_argument("--sum", action='store_true', help="SUM rather than OR")
 
 args = parser.parse_args()
-# args = parser.parse_args('--in_dir /Users/gsanroma/DATA/DATABASES/STACOM17/templates '
-#                          '--in_suffix _mask2.nii.gz '
-#                          '--out_dir /Users/gsanroma/DATA/DATABASES/STACOM17/templates/ '
-#                          '--out_suffix_or_mask_file _mask2.nii.gz '
-#                          '--dilation_radius 5x5x5 '.split())
+# args = parser.parse_args('--in_dir /home/sanromag/DATA/OB/data_partitions/reg_S3m/e2498a3b/ '
+#                          '--in_suffix _OBVWarped.nii.gz '
+#                          '--template_file /home/sanromag/DATA/OB/data_partitions/data_test/e2498a3b_t2.nii.gz '
+#                          '--out_suffix_or_mask_file e2498a3b_sum.nii.gz '
+#                          '--sum '.split())
 
 
 files_list = os.listdir(args.in_dir[0])
@@ -31,7 +32,10 @@ if args.template_file is not None:
     template_nib = nib.load(args.template_file[0])
     template = template_nib.get_data()
     img_size = template.shape
-    mask = np.zeros(img_size, dtype=np.bool)
+    if args.sum:
+        mask = np.zeros(img_size, dtype=np.float)
+    else:
+        mask = np.zeros(img_size, dtype=np.bool)
 
 dilat_rad = [int(f) for f in args.dilation_radius[0].split('x')]
 assert len(dilat_rad) == 3, 'Wrong dilation radius format'
@@ -54,8 +58,11 @@ for file in files_list:
     img = img_nib.get_data()
 
     if single_mask:
-        mask[img > 0] = True
         aux_nib = img_nib
+        if args.sum:
+            mask[img > 0] += 1. / float(len(files_list))
+        else:
+            mask[img > 0] = True
     else:
         mask = np.zeros(img.shape, dtype=np.bool)
         mask[img > 0] = True
@@ -65,7 +72,8 @@ for file in files_list:
         del mask
 
 if single_mask:
-    mask = binary_dilation(mask, struct)
+    if not args.sum:
+        mask = binary_dilation(mask, struct)
 
     mask_nib = nib.Nifti1Image(mask, aux_nib.affine, aux_nib.header)
     nib.save(mask_nib, os.path.join(out_dir, args.out_suffix_or_mask_file[0]))
