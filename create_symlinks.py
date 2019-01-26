@@ -14,7 +14,7 @@ parser.add_argument("--insert_intfix", type=str, nargs=1, help="(optional) Intfi
 
 args = parser.parse_args()
 
-sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'modules'))
+sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'src', 'modules'))
 from utils import get_files_superlist
 
 filenames_list, _ = get_files_superlist(args.filenames_dir, args.filenames_suffix)

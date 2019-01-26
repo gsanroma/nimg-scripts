@@ -67,13 +67,18 @@ for file in files_list:
         mask = np.zeros(img.shape, dtype=np.bool)
         mask[img > 0] = True
         mask = binary_dilation(mask, struct)
-        mask_nib = nib.Nifti1Image(mask, img_nib.affine, img_nib.header)
+        aux_nib = img_nib
+        aux_nib.header.set_data_dtype(np.int8)
+        mask_nib = nib.Nifti1Image(mask, aux_nib.affine, aux_nib.header)
         nib.save(mask_nib, os.path.join(out_dir, file.split(args.in_suffix[0])[0] + args.out_suffix_or_mask_file[0]))
         del mask
 
 if single_mask:
     if not args.sum:
         mask = binary_dilation(mask, struct)
+        aux_nib.header.set_data_dtype(np.int8)
+    else:
+        aux_nib.header.set_data_dtype(np.float32)
 
     mask_nib = nib.Nifti1Image(mask, aux_nib.affine, aux_nib.header)
     nib.save(mask_nib, os.path.join(out_dir, args.out_suffix_or_mask_file[0]))
