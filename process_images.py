@@ -189,7 +189,7 @@ if args.n4[0] != 0:
             cmdline.extend(['--shrink-factor', '%d' % args.n4[0]])
             if mask_file is not None:
                 cmdline.extend(['--mask-image', os.path.join(in_dir, mask_file)])
-            cmdline.extend(['--convergence', '[50x50x30x20,1e-6]'])
+            cmdline.extend(['--convergence', '[30x30x20x10,1e-6]'])
             cmdline.extend(['--bspline-fitting', '300'])
             cmdline.extend(['--output', os.path.join(args.out_dir[0], img_file)])
 
