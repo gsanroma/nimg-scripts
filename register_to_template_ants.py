@@ -28,8 +28,8 @@ from scheduler import Launcher
 launcher = Launcher(args.num_procs[0])
 
 # default num of iterations
-ITS_LINEAR = ['%d' % int(1000 / args.speedup[0]), '%d' % int(500 / args.speedup[0]), '%d' % int(250 / args.speedup[0]), '%d' % int(100 / args.speedup[0])]
-ITS_SYN = ['%d' % int(100 / args.speedup[0]), '%d' % int(100 / args.speedup[0]), '%d' % int(70 / args.speedup[0]), '%d' % int(20 / args.speedup[0])]
+ITS_LINEAR = ['%d' % int(500 / args.speedup[0]), '%d' % int(250 / args.speedup[0]), '%d' % int(125 / args.speedup[0]), '%d' % int(50 / args.speedup[0])]
+ITS_SYN = ['%d' % int(70 / args.speedup[0]), '%d' % int(50 / args.speedup[0]), '%d' % int(30 / args.speedup[0]), '%d' % int(10 / args.speedup[0])]
 
 #
 # Initial checks
