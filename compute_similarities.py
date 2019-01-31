@@ -58,7 +58,7 @@ if method_cmdline:
 
 # get file list
 
-sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'modules'))
+sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'src', 'modules'))
 from utils import get_files_superlist
 
 in1_names_list, files_superlist = get_files_superlist(args.in_dir, args.in_suffix)
