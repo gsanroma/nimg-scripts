@@ -50,7 +50,7 @@ if args.method[0] in ['NormalizedCorrelation']:
 launcher = None
 check_file_repeat = None
 if method_cmdline:
-    sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'modules'))
+    sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'src', 'modules'))
     from scheduler import Launcher, check_file_repeat
 
     launcher = Launcher(args.num_procs[0])
