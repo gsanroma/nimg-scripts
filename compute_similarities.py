@@ -96,7 +96,7 @@ if args.mask_file is not None:
 scores = np.zeros((len(in1_files_list), len(in2_files_list)), dtype=np.float32)
 for i1, (file1, name1) in enumerate(zip(in1_files_list, in1_names_list)):
 
-    print "Computing similarities for file %s" % name1
+    print "Computing similarities for file %s (%d out of %d)" % (name1, i1+1, len(in1_files_list))
 
     name_list = []
 
