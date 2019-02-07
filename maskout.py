@@ -30,7 +30,7 @@ if args.out_suffix_list is not None:
     out_suffix_list = args.out_suffix_list
 
 # get files superlist
-sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'modules'))
+sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'src', 'modules'))
 from utils import get_files_superlist
 
 # note that mask suffix is appended in the end
