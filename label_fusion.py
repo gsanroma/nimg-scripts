@@ -455,7 +455,7 @@ if __name__ == "__main__":
             if args.target_deform_intfix is not None:
                 cmdline += ['--in_deform_intfix', args.target_deform_intfix[0]]
             cmdline += ['--out_dir', args.out_reg_dir[0]]
-            cmdline += ['--out_suffix', 'Warped.nii.gz']
+            cmdline += ['--out_suffix', '_Warped.nii.gz']
             if args.float: cmdline += ['--float']
             cmdline += ['--num_procs', '%d' % args.num_procs[0]]
 
@@ -475,7 +475,7 @@ if __name__ == "__main__":
                 if atlas_deform_intfix is not None:
                     cmdline += ['--in_deform_intfix', atlas_deform_intfix]
                 cmdline += ['--out_dir', args.out_reg_dir[0]]
-                cmdline += ['--out_suffix', 'Warped.nii.gz']
+                cmdline += ['--out_suffix', '_Warped.nii.gz']
                 if args.float: cmdline += ['--float']
                 cmdline += ['--num_procs', '%d' % args.num_procs[0]]
 
@@ -539,7 +539,7 @@ if __name__ == "__main__":
                 if args.target_deform_intfix is not None:
                     cmdline += ['--target_deform_intfix', args.target_deform_intfix[0]]
                 cmdline += ['--out_dir', target_reg_dir]
-                cmdline += ['--out_suffix', 'Warped.nii.gz']
+                cmdline += ['--out_suffix', '_Warped.nii.gz']
                 if args.float: cmdline += ['--float']
                 cmdline += ['--num_procs', '%d' % args.num_procs[0]]
 
@@ -548,8 +548,8 @@ if __name__ == "__main__":
                 call(cmdline)
 
                 target_path = os.path.join(args.target_dir[0], target_img_files[i_t])
-                atlas_img_path_list = [os.path.join(target_reg_dir, atlas_img_files[i_a].split(os.extsep, 1)[0] + 'Warped.nii.gz') for i_a in atlas_idx[i_t]]
-                atlas_lab_path_list = [os.path.join(target_reg_dir, atlas_lab_files[i_a].split(os.extsep, 1)[0] + 'Warped.nii.gz') for i_a in atlas_idx[i_t]]
+                atlas_img_path_list = [os.path.join(target_reg_dir, atlas_img_files[i_a].split(os.extsep, 1)[0] + '_Warped.nii.gz') for i_a in atlas_idx[i_t]]
+                atlas_lab_path_list = [os.path.join(target_reg_dir, atlas_lab_files[i_a].split(os.extsep, 1)[0] + '_Warped.nii.gz') for i_a in atlas_idx[i_t]]
 
                 target_mask_path = None
                 if args.target_mask_suffix is not None:
@@ -559,7 +559,7 @@ if __name__ == "__main__":
                     if args.maskout_reg_files:
                         cmdline = ['python', '-u', maskout_path]
                         cmdline += ['--in_dir', target_reg_dir]
-                        cmdline += ['--in_suffix_list', atlas_img_suffix.split(os.extsep, 1)[0] + 'Warped.nii.gz']
+                        cmdline += ['--in_suffix_list', atlas_img_suffix.split(os.extsep, 1)[0] + '_Warped.nii.gz']
                         cmdline += ['--mask_file', target_mask_path]
                         cmdline += ['--num_procs', '%d' % args.num_procs[0]]
 
@@ -570,9 +570,9 @@ if __name__ == "__main__":
 
             else:
 
-                target_path = os.path.join(args.out_reg_dir[0], target_img_files[i_t].split(os.extsep, 1)[0] + 'Warped.nii.gz')
-                atlas_img_path_list = [os.path.join(args.out_reg_dir[0], atlas_img_files[i_a].split(os.extsep, 1)[0] + 'Warped.nii.gz') for i_a in atlas_idx[i_t]]
-                atlas_lab_path_list = [os.path.join(args.out_reg_dir[0], atlas_lab_files[i_a].split(os.extsep, 1)[0] + 'Warped.nii.gz') for i_a in atlas_idx[i_t]]
+                target_path = os.path.join(args.out_reg_dir[0], target_img_files[i_t].split(os.extsep, 1)[0] + '_Warped.nii.gz')
+                atlas_img_path_list = [os.path.join(args.out_reg_dir[0], atlas_img_files[i_a].split(os.extsep, 1)[0] + '_Warped.nii.gz') for i_a in atlas_idx[i_t]]
+                atlas_lab_path_list = [os.path.join(args.out_reg_dir[0], atlas_lab_files[i_a].split(os.extsep, 1)[0] + '_Warped.nii.gz') for i_a in atlas_idx[i_t]]
 
                 target_mask_path = None
                 if args.target_mask_suffix is not None:
