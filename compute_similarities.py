@@ -20,7 +20,13 @@ parser.add_argument("--num_procs", type=int, nargs=1, default=[8], help='number 
 parser.add_argument("--num_itk_threads", type=int, nargs=1, default=[1], help='number of threads per proc ')
 
 args = parser.parse_args()
-# args = parser.parse_args('--in_dir /home/sanromag/DATA/OB/tmp/ --in_suffix _OBV_S3mXtpl_Warped.nii.gz --in2_dir /home/sanromag/DATA/OB/transforms_ini --in2_suffix _OBV_S3mXtpl_Warped.nii.gz --method Dice --out_file /home/sanromag/DATA/OB/templates/kk.dat --num_procs 25'.split())
+# args = parser.parse_args('--in_dir /home/sanromag/DATA/OB/transformations/transforms_kk/ '
+#                          '--in_suffix _OBV_S3Xtpl_Warped.nii.gz '
+#                          '--mask_file /home/sanromag/DATA/OB/templates/mni152/mni152_A2Xtpl_OBVmask1.nii.gz '
+#                          '--method Dice 1 3 '
+#                          '--out_file /home/sanromag/DATA/OB/templates/similarities/kk.dat '
+#                          '--num_procs 5 '
+#                          ''.split())
 
 def avg_dice_distance(t1, t2, label_ids=None):
 
@@ -110,7 +116,7 @@ for i1, (file1, name1) in enumerate(zip(in1_files_list, in1_names_list)):
         else:
             mask = np.ones(img1.shape, dtype=np.bool)
 
-        def sim(img1, file_path, method):
+        def sim(img1, file_path, method, mask):
             """Computes similarity between two images
 
             Parameters
@@ -152,7 +158,7 @@ for i1, (file1, name1) in enumerate(zip(in1_files_list, in1_names_list)):
 
             return score
 
-        scores_i1 = Parallel(n_jobs=args.num_procs[0])(delayed(sim)(img1, os.path.join(in2_dir, file2), args.method) for file2 in in2_files_list)
+        scores_i1 = Parallel(n_jobs=args.num_procs[0])(delayed(sim)(img1, os.path.join(in2_dir, file2), args.method, mask) for file2 in in2_files_list)
         # scores_i1 = [sim(img1, os.path.join(in2_dir, file2), args.method) for file2 in in2_files_list]
 
         scores[i1] = scores_i1
