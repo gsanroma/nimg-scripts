@@ -23,7 +23,7 @@ args = parser.parse_args()
 # args = parser.parse_args('--in_dir /home/sanromag/DATA/OB/transformations/transforms_kk/ '
 #                          '--in_suffix _OBV_S3Xtpl_Warped.nii.gz '
 #                          '--mask_file /home/sanromag/DATA/OB/templates/mni152/mni152_A2Xtpl_OBVmask1.nii.gz '
-#                          '--method Dice 1 3 '
+#                          '--method Dice '
 #                          '--out_file /home/sanromag/DATA/OB/templates/similarities/kk.dat '
 #                          '--num_procs 5 '
 #                          ''.split())
