@@ -28,14 +28,16 @@ parser.add_argument("--use_subset", type=str, nargs=3, help='(optional) img_dir,
 parser.add_argument("--num_folds", type=int, nargs=1, help="(optional) number of folds")
 parser.add_argument("--num_atlas", type=int, nargs=1, help="(optional) number of atlases (assumes single fold)")
 parser.add_argument("--num_val", type=int, nargs=1, default=[0], help="(optional) number of validation samples within the atlas set")
-parser.add_argument("--out_fig", type=str, nargs=1)
+# parser.add_argument("--out_fig", type=str, nargs=1)
 parser.add_argument("--create_symlinks", type=str, nargs=5, help='symlink_dir_prefix, origin_dir, img_suffix, label_suffix, scores_img_suffix')
 
 args = parser.parse_args()
-# args = parser.parse_args('--scores_file /home/sanromag/DATA/OB/templates/Dice_S3mXtpl.dat --use_subset /home/sanromag/DATA/OB/data_orig _t2.nii.gz _OBV_S3mXtpl_Warped.nii.gz --num_atlas 50 --out_fig /home/sanromag/DATA/OB/atlases.png'.split())
-# args = parser.parse_args('--scores_file /home/sanromag/DATA/OB/templates/Dice_S3mXtpl.dat --num_atlas 50 --out_fig /home/sanromag/DATA/OB/atlases.png'.split())
+# args = parser.parse_args('--scores_file /home/sanromag/DATA/OB/templates/similarities/ants10_Dice_S3Xtpl.dat '
+#                          '--num_atlas 60 '
+#                          '--num_val 10 '
+#                          ''.split())
 
-sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'modules'))
+sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'src', 'modules'))
 from utils import read_sim_scores, get_files_superlist
 
 scores_dict = read_sim_scores(args.scores_file[0])
@@ -83,85 +85,95 @@ else:
 # Select the atlases most spread in the manifold
 #
 
-Y = manifold.SpectralEmbedding(n_components=2, affinity='precomputed').fit_transform(scores)
+# Y = manifold.SpectralEmbedding(n_components=2, affinity='precomputed').fit_transform(scores)
+#
+# atlas_idx = []
+# target_idx = []
+# val_idx = []
+#
+# if args.num_folds is not None:
+#
+#     indexes = np.arange(Nimgs)
+#
+#     for i_fold in range(n_folds):
+#
+#         if i_fold < n_folds - 1:
+#
+#             labels = cluster.KMeans(Ntargets[i_fold], random_state=1234).fit_predict(Y[indexes])
+#
+#             # Computation of cluster representatives
+#             centers = np.zeros((Ntargets[i_fold], Y.shape[1]))
+#             for i in range(Ntargets[i_fold]):
+#                 centers[i] = np.mean(Y[indexes[labels == i]], axis=0)
+#
+#             D = distance.cdist(centers, Y[indexes], metric='euclidean', p=2)
+#
+#             target_idx += [list(indexes[list(np.argmin(D, axis=1))])]
+#             remaining_idx = np.array(list(set(range(Nimgs)) - set(target_idx[-1])))
+#
+#         else:
+#
+#             assert indexes.size == Ntargets[-1], "number of remaining indices do not coincide with number of targets in last fold"
+#             target_idx += [list(indexes)]
+#             remaining_idx = np.array(list(set(range(Nimgs)) - set(target_idx[-1])))
+#
+#         #
+#         # validation set
+#
+#         if args.num_val[0] > 0:
+#
+#             labels = cluster.KMeans(args.num_val[0], random_state=1234).fit_predict(Y[remaining_idx])
+#
+#             # Computation of cluster representatives
+#             centers = np.zeros((args.num_val[0], Y.shape[1]))
+#             for i in range(args.num_val[0]):
+#                 centers[i] = np.mean(Y[remaining_idx[labels == i]], axis=0)
+#
+#             D = distance.cdist(centers, Y[remaining_idx], metric='euclidean', p=2)
+#
+#             val_idx += [list(remaining_idx[list(np.argmin(D, axis=1))])]
+#             atlas_idx += [list(set(range(Nimgs)) - set(target_idx[-1]) - set(val_idx[-1]))]
+#
+#         else:
+#             atlas_idx += [list(remaining_idx)]
+#             val_idx += [[]]
+#
+#         #
+#         # Remove current targets from set of available indices
+#
+#         indexes = np.array(list(set(indexes) - set(target_idx[-1])))
+#
+# else:
+#
+#     labels = cluster.KMeans(Natlas, random_state=1234).fit_predict(Y)
+#     centers = np.zeros((Natlas, Y.shape[1]))
+#     for i in range(Natlas): centers[i] = np.mean(Y[labels == i], axis=0)
+#     D = distance.cdist(centers, Y, metric='euclidean', p=2)
+#     remaining_idx = np.array(list(np.argmin(D, axis=1)))
+#     target_idx = [list(set(range(Nimgs)) - set(list(remaining_idx)))]
+#     # validation set
+#     if args.num_val[0] > 0:
+#         labels = cluster.KMeans(args.num_val[0], random_state=1234).fit_predict(Y[remaining_idx])
+#         centers = np.zeros((args.num_val[0], Y.shape[1]))
+#         for i in range(args.num_val[0]):
+#             centers[i] = np.mean(Y[remaining_idx[labels == i]], axis=0)
+#         D = distance.cdist(centers, Y[remaining_idx], metric='euclidean', p=2)
+#         val_idx += [list(remaining_idx[list(np.argmin(D, axis=1))])]
+#         atlas_idx += [list(set(remaining_idx) - set(val_idx[0]))]
+#     else:
+#         atlas_idx = [list(remaining_idx)]
+#         val_idx = [[]]
 
-atlas_idx = []
-target_idx = []
-val_idx = []
 
-if args.num_folds is not None:
-
-    indexes = np.arange(Nimgs)
-
-    for i_fold in range(n_folds):
-
-        if i_fold < n_folds - 1:
-
-            labels = cluster.KMeans(Ntargets[i_fold], random_state=1234).fit_predict(Y[indexes])
-
-            # Computation of cluster representatives
-            centers = np.zeros((Ntargets[i_fold], Y.shape[1]))
-            for i in range(Ntargets[i_fold]):
-                centers[i] = np.mean(Y[indexes[labels == i]], axis=0)
-
-            D = distance.cdist(centers, Y[indexes], metric='euclidean', p=2)
-
-            target_idx += [list(indexes[list(np.argmin(D, axis=1))])]
-            remaining_idx = np.array(list(set(range(Nimgs)) - set(target_idx[-1])))
-
-        else:
-
-            assert indexes.size == Ntargets[-1], "number of remaining indices do not coincide with number of targets in last fold"
-            target_idx += [list(indexes)]
-            remaining_idx = np.array(list(set(range(Nimgs)) - set(target_idx[-1])))
-
-        #
-        # validation set
-
-        if args.num_val[0] > 0:
-
-            labels = cluster.KMeans(args.num_val[0], random_state=1234).fit_predict(Y[remaining_idx])
-
-            # Computation of cluster representatives
-            centers = np.zeros((args.num_val[0], Y.shape[1]))
-            for i in range(args.num_val[0]):
-                centers[i] = np.mean(Y[remaining_idx[labels == i]], axis=0)
-
-            D = distance.cdist(centers, Y[remaining_idx], metric='euclidean', p=2)
-
-            val_idx += [list(remaining_idx[list(np.argmin(D, axis=1))])]
-            atlas_idx += [list(set(range(Nimgs)) - set(target_idx[-1]) - set(val_idx[-1]))]
-
-        else:
-            atlas_idx += [list(remaining_idx)]
-            val_idx += [[]]
-
-        #
-        # Remove current targets from set of available indices
-
-        indexes = np.array(list(set(indexes) - set(target_idx[-1])))
-
-else:
-
-    labels = cluster.KMeans(Natlas, random_state=1234).fit_predict(Y)
-    centers = np.zeros((Natlas, Y.shape[1]))
-    for i in range(Natlas): centers[i] = np.mean(Y[labels == i], axis=0)
-    D = distance.cdist(centers, Y, metric='euclidean', p=2)
-    remaining_idx = np.array(list(np.argmin(D, axis=1)))
-    target_idx = [list(set(range(Nimgs)) - set(list(remaining_idx)))]
-    # validation set
-    if args.num_val[0] > 0:
-        labels = cluster.KMeans(args.num_val[0], random_state=1234).fit_predict(Y[remaining_idx])
-        centers = np.zeros((args.num_val[0], Y.shape[1]))
-        for i in range(args.num_val[0]):
-            centers[i] = np.mean(Y[remaining_idx[labels == i]], axis=0)
-        D = distance.cdist(centers, Y[remaining_idx], metric='euclidean', p=2)
-        val_idx += [list(remaining_idx[list(np.argmin(D, axis=1))])]
-        atlas_idx += [list(set(remaining_idx) - set(val_idx[0]))]
-    else:
-        atlas_idx = [list(remaining_idx)]
-        val_idx = [[]]
-
+mu_dice = scores_dict['scores'].mean(1)
+sorted_idx = np.argsort(mu_dice)
+atlas_stride = np.linspace(0, Nimgs - 1, args.num_atlas[0]).astype(int)
+target_stride = np.array(list(set(range(Nimgs)) - set(atlas_stride)))
+target_idx = [list(sorted_idx[target_stride])]
+atlas_idx = sorted_idx[atlas_stride]
+val_stride = np.linspace(0, args.num_atlas[0] - 1, args.num_val[0]).astype(int)
+val_idx = [list(atlas_idx[val_stride])]
+atlas_idx = [list(np.delete(atlas_idx, val_stride))]
 
 # for i in range(n_folds):
 #     assert set(atlas_idx[i] + target_idx[i] + val_idx[i]) == set(range(Nimgs))
@@ -171,32 +183,32 @@ else:
 # Plot the atlases in the manifold
 #
 
-if args.out_fig is not None:
-
-    n_colors = 3 if args.num_val > 0 else 2
-
-    distinct_colors = plt.get_cmap('jet')(np.linspace(0, 1.0, n_colors))
-
-    plt.figure()
-
-    for i_fold in range(n_folds):
-
-        plt.subplot('1%d%d' % (n_folds, i_fold))
-        plt.scatter(Y[:, 0], Y[:, 1], s=10, c=distinct_colors[0], cmap=plt.cm.Spectral)
-
-        plt.title("Atlases in fold %d" % i_fold)
-
-        for i_img in range(Nimgs):
-            plt.annotate('%d' % i_img, (Y[i_img, 0], Y[i_img, 1]), fontsize=7)
-
-        Yatlas = Y[atlas_idx[i_fold]]
-        plt.scatter(Yatlas[:, 0], Yatlas[:, 1], s=60, facecolors='none', edgecolors=distinct_colors[1], cmap=plt.cm.Spectral)
-
-        if args.num_val[0] > 0:
-            Yval = Y[val_idx[i_fold]]
-            plt.scatter(Yval[:, 0], Yval[:, 1], s=60, facecolors='none', edgecolors=distinct_colors[2], cmap=plt.cm.Spectral, linestyle='dashed')
-
-        plt.savefig(args.out_fig[0])
+# if args.out_fig is not None:
+#
+#     n_colors = 3 if args.num_val > 0 else 2
+#
+#     distinct_colors = plt.get_cmap('jet')(np.linspace(0, 1.0, n_colors))
+#
+#     plt.figure()
+#
+#     for i_fold in range(n_folds):
+#
+#         plt.subplot('1%d%d' % (n_folds, i_fold))
+#         plt.scatter(Y[:, 0], Y[:, 1], s=10, c=distinct_colors[0], cmap=plt.cm.Spectral)
+#
+#         plt.title("Atlases in fold %d" % i_fold)
+#
+#         for i_img in range(Nimgs):
+#             plt.annotate('%d' % i_img, (Y[i_img, 0], Y[i_img, 1]), fontsize=7)
+#
+#         Yatlas = Y[atlas_idx[i_fold]]
+#         plt.scatter(Yatlas[:, 0], Yatlas[:, 1], s=60, facecolors='none', edgecolors=distinct_colors[1], cmap=plt.cm.Spectral)
+#
+#         if args.num_val[0] > 0:
+#             Yval = Y[val_idx[i_fold]]
+#             plt.scatter(Yval[:, 0], Yval[:, 1], s=60, facecolors='none', edgecolors=distinct_colors[2], cmap=plt.cm.Spectral, linestyle='dashed')
+#
+#         plt.savefig(args.out_fig[0])
 
 
 #

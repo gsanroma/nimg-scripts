@@ -46,9 +46,6 @@ def label_fusion(launcher, target_path, atlas_img_path_list, atlas_lab_path_list
 
             jointfusion_path = os.path.join(os.environ['ANTSPATH'], 'antsJointFusion')
 
-            # prob_path = os.path.join(target_tmp_dir, 'prob%d.nii.gz')
-            prob_path = os.path.join(out_dir, out_name + '_prob%d.nii.gz')
-
             cmdline = ['ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=%d' % num_itk_threads, jointfusion_path]
             cmdline.extend(['-d', '3'])
             cmdline.extend(['-t', target_path])
@@ -66,10 +63,12 @@ def label_fusion(launcher, target_path, atlas_img_path_list, atlas_lab_path_list
             if joint_beta is not None: cmdline.extend(['-b', '%f' % joint_beta])
             if joint_metric is not None: cmdline.extend(['-m', joint_metric])
 
-            # if probabilities:
-                # if not os.path.exists(target_tmp_dir): os.makedirs(target_tmp_dir)
-                # cmdline.extend(['-p', prob_path])
-            cmdline.extend(['-o', out_file])
+            if probabilities:
+                prob_path = os.path.join(out_dir, out_name + '_prob%d.nii.gz')
+                int_path = os.path.join(out_dir, out_name + '_int%d.nii.gz')
+                cmdline.extend(['-o [%s,%s,%s]' % (out_file, int_path, prob_path)])
+            else:
+                cmdline.extend(['-o', out_file])
 
         elif method == 'majvot':
 
