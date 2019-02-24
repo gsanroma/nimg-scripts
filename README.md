@@ -1,5 +1,5 @@
 # Neuroimaging Scripts
-This repository contains scripts I've developed over the last years for quick and efficient processing of Neuroimaging data.
+This repository contains scripts I've developed over the last years for efficient processing of Neuroimaging data.
 Some of the scripts require installation of ANTs or FSL tools.
 
 Common Neuroimaging packages provide useful tools to do all kinds of stuff with Neuroimaging data.
