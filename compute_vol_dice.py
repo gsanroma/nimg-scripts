@@ -83,9 +83,9 @@ for i, (ref_name, ref_file) in enumerate(zip(ref_names, ref_files)):
 
     # compute whole volume metrics
     df.loc[ref_name, 'ref_vol'] = (ref > 0).sum()
-    df.loc[ref_name, 'in2_vol'] = (in2 > 0).sum()
-
-    df.loc[ref_name, 'dice'] = 1. - dice((ref > 0).ravel(), (in2 > 0).ravel())
+    if in2_files:
+        df.loc[ref_name, 'in2_vol'] = (in2 > 0).sum()
+        df.loc[ref_name, 'dice'] = 1. - dice((ref > 0).ravel(), (in2 > 0).ravel())
 
     # brain_nib = nib.load(os.path.join(args.brain_dir[0], brain_files[i]))
     # brain = brain_nib.get_data().astype(np.bool)
