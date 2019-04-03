@@ -37,8 +37,6 @@ else:  # link only those files in source that do not match to any file in filena
             auxfiles_list.append(files_superlist[j][i])
         sources_superlist.append(auxfiles_list)
 
-
-
 aux_list = [f for sources_list in sources_superlist for f in sources_list]
 cond_list = [os.path.exists(os.path.join(args.source_dir[0], f)) for f in aux_list]
 if False in cond_list:
