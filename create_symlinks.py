@@ -37,9 +37,17 @@ else:  # link only those files in source that do not match to any file in filena
             auxfiles_list.append(files_superlist[j][i])
         sources_superlist.append(auxfiles_list)
 
-print [f for sources_list in sources_superlist for f in sources_list]
-print [os.path.exists(os.path.join(args.source_dir[0], f)) for sources_list in sources_superlist for f in sources_list]
-assert False not in [os.path.exists(os.path.join(args.source_dir[0], f)) for sources_list in sources_superlist for f in sources_list], "Source dir does not contain all files in filenames dir"
+
+
+aux_list = [f for sources_list in sources_superlist for f in sources_list]
+cond_list = [os.path.exists(os.path.join(args.source_dir[0], f)) for f in aux_list]
+if False in cond_list:
+    print('Following files in filenames_dir not found in source_dir:')
+    for i, b in enumerate(cond_list):
+        if not b:
+            print(aux_list[i])
+    sys.exit()
+# assert False not in cond_list, "Source dir does not contain all files in filenames dir"
 
 # if destination dir does not exist, create it
 if not os.path.exists(args.destination_dir[0]):
