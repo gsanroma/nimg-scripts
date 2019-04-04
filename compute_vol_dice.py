@@ -25,15 +25,15 @@ parser.add_argument("--per_label", action='store_true', help="extract values per
 # parser.add_argument("--brain_suffix", type=str, nargs=1, help="(optional) Suffix of brain mask files")
 parser.add_argument("--out_fig", type=str, nargs=1, help="Output fig")
 parser.add_argument("--out_csv", type=str, nargs=1, help="Output csv")
-parser.add_argument("--num_procs", type=int, nargs=1, help="Number of parallel processes")
+parser.add_argument("--num_procs", type=int, nargs=1, default=[1], help="Number of parallel processes")
 
 args = parser.parse_args()
-# args = parser.parse_args('--ref_dir /home/sanromag/DATA/OB/tmp/ '
+# args = parser.parse_args('--ref_dir /home/sanromag/DATA/OB/deepmedic/results/predictions/t1_pretrain/predictions/ '
 #                          '--ref_suffix _Segm.nii.gz '
-#                          '--in2_dir /home/sanromag/DATA/OB/data_n4_norm '
+#                          '--in2_dir /home/sanromag/DATA/OB/deepmedic/partitions/test/ '
 #                          '--in2_suffix _OBV.nii.gz '
 #                          '--per_label '
-#                          '--out_csv /home/sanromag/DATA/OB/tmp/kk.csv '
+#                          '--out_csv /home/sanromag/DATA/OB/deepmedic/metrics/debug.csv '
 #                          ''.split())
 
 # List of estimated files
