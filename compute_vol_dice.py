@@ -93,6 +93,10 @@ for i, (ref_name, ref_file) in enumerate(zip(ref_names, ref_files)):
 
 # gtr_vol_norm = gtr_vols/brain_vols
 
+# Print mean across-columns
+print('MEANS: ')
+print(df.mean(0))
+
 # plot
 if args.out_fig is not None and args.in2_dir is not None:
 
