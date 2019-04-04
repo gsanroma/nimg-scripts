@@ -4,6 +4,7 @@ import numpy as np
 import nibabel as nib
 import pandas as pd
 from scipy.spatial.distance import dice
+from joblib import Parallel, delayed
 
 import matplotlib
 # Force matplotlib to not use any Xwindows backend.
@@ -54,14 +55,9 @@ if args.in2_dir is not None:
 #     assert not False in [os.path.exists(os.path.join(args.brain_dir[0], f)) for f in brain_files], "Some brain mask file not found"
 
 
-#
-# Read actual files
+def metrics(i, ref_name, ref_file, args):
 
-df = pd.DataFrame([])
-
-for i, (ref_name, ref_file) in enumerate(zip(ref_names, ref_files)):
-
-    print('Reading %s (%d of %d)' % (ref_names[i], i, len(ref_names)))
+    # print('Reading %s (%d of %d)' % (ref_names[i], i, len(ref_names)))
 
     ref = np.round(nib.load(os.path.join(args.ref_dir[0], ref_file)).get_data()).astype(int)
 
@@ -90,6 +86,17 @@ for i, (ref_name, ref_file) in enumerate(zip(ref_names, ref_files)):
     # brain_nib = nib.load(os.path.join(args.brain_dir[0], brain_files[i]))
     # brain = brain_nib.get_data().astype(np.bool)
     # brain_vols[i] = brain.sum()
+
+
+
+#
+# Read actual files
+
+df = pd.DataFrame([])
+
+# for i, (ref_name, ref_file) in enumerate(zip(ref_names, ref_files)):
+
+scores_i1 = Parallel(n_jobs=args.num_procs[0])(delayed(metrics)(i, ref_name, ref_file, args) for i, (ref_name, ref_file) in enumerate(zip(ref_names, ref_files)))
 
 # gtr_vol_norm = gtr_vols/brain_vols
 
