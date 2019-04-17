@@ -27,3 +27,6 @@ The repository contains the following scripts:
 * `threshold_probmaps.py`: Thresholds label probability maps and outputs binary segmentations 
 * `warp_atlases_to_target.py`: Warp atlas images in a directory to a target image using given linear and/or deformable transforms. Optionally, the target can be warped to atlases with the --inverse flag. 
 * `warp_to_template.py`: Warp images to template space. Optionally, the inverse transformation can be done 
+
+## License
+License for this software package: BSD 3-Clause License. A copy of this license is present in the root directory
