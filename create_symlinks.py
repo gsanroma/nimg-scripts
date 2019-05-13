@@ -17,7 +17,7 @@ args = parser.parse_args()
 sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'src', 'modules'))
 from utils import get_files_superlist
 
-filenames_list, _ = get_files_superlist(args.filenames_dir, args.filenames_suffix)
+filenames_list, _, _ = get_files_superlist(args.filenames_dir, args.filenames_suffix)
 assert filenames_list, "filenames list is empty"
 
 srcnames_list = filenames_list
