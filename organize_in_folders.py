@@ -6,7 +6,8 @@ parser = argparse.ArgumentParser('Puts modalities for each subject in a folder w
 parser.add_argument("--in_dir", type=str, nargs=1, required=True, help="directory containing all files from all subjects")
 parser.add_argument("--in_suffix_list", type=str, nargs='+', required=True, help="list of suffixes for each modality")
 parser.add_argument("--out_dir", type=str, nargs=1, required=True, help="base directory where to create the out directory structure")
-parser.add_argument("--out_name_list", type=str, nargs='+', help="(optional) list of names to give to output files (if not given, same as original names)")
+parser.add_argument("--out_name_list", type=str, nargs='+', help="(optional) list of names to give to output files (if not given, same as original names)"
+                                                                 "If a subdirectory is specified (eg, folder/name.nii.gz), it will be created in the base folder of the subject")
 
 args = parser.parse_args()
 
@@ -32,7 +33,13 @@ for name, files_list in zip(names_list, files_superlist_t):
     subject_dir = os.path.join(args.out_dir[0], name)
     for i, file in enumerate(files_list):
         if args.out_name_list is not None:
-            os.symlink(os.path.join(args.in_dir[0], file), os.path.join(subject_dir, args.out_name_list[i]))
+            out_folder = os.path.dirname(args.out_name_list[i])
+            out_name = os.path.basename(args.out_name_list[i])
+            if not (out_folder):  # if there is no subfolder, then directly create file
+                os.symlink(os.path.join(args.in_dir[0], file), os.path.join(subject_dir, out_name))
+            else:  # otherwise create subfolder and link the file within
+                os.makedirs(os.path.join(subject_dir, out_folder))
+                os.symlink(os.path.join(args.in_dir[0], file), os.path.join(subject_dir, out_folder, out_name))
         else:
             os.symlink(os.path.join(args.in_dir[0], file), os.path.join(subject_dir, file))
 
