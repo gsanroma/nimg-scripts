@@ -7,7 +7,7 @@ parser.add_argument("--in_dir", type=str, nargs=1, required=True, help="director
 parser.add_argument("--in_suffix_list", type=str, nargs='+', required=True, help="list of suffixes for each modality")
 parser.add_argument("--out_dir", type=str, nargs=1, required=True, help="base directory where to create the out directory structure")
 parser.add_argument("--out_name_list", type=str, nargs='+', help="(optional) list of names to give to output files (if not given, same as original names)")
-parser.add_argument("--abspath", type='store_true', help="whether to use absolute path for symlinks (default: relative from \'in_dir\')")
+parser.add_argument("--abspath", action='store_true', help="whether to use absolute path for symlinks (default: relative from \'in_dir\')")
 
 args = parser.parse_args()
 
