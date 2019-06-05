@@ -40,7 +40,17 @@ for name, files_list in zip(names_list, files_superlist_t):
         if not args.abspath:
             src = os.path.relpath(os.path.join(args.in_dir[0], file))
         if args.out_name_list is not None:
+<<<<<<< HEAD
             os.symlink(src, os.path.join(subject_dir, args.out_name_list[i]))
+=======
+            out_folder = os.path.dirname(args.out_name_list[i])
+            out_name = os.path.basename(args.out_name_list[i])
+            if not (out_folder):  # if there is no subfolder, then directly create file
+                os.symlink(os.path.join(args.in_dir[0], file), os.path.join(subject_dir, out_name))
+            else:  # otherwise create subfolder and link the file within
+                os.makedirs(os.path.join(subject_dir, out_folder))
+                os.symlink(os.path.join(args.in_dir[0], file), os.path.join(subject_dir, out_folder, out_name))
+>>>>>>> df51b05b07349fa39c691cc9c566b9d8d6c9eecb
         else:
             os.symlink(src, os.path.join(subject_dir, file))
 
