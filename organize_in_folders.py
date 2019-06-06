@@ -30,6 +30,7 @@ for name in names_list:
 
 # change to output directory (in case not absolute paths)
 if not args.abspath:
+    print('changing to path %s' % args.out_dir[0])
     os.chdir(args.out_dir[0])
 
 # link each subject files to the output subject subdirectory
@@ -38,7 +39,9 @@ for name, files_list in zip(names_list, files_superlist_t):
     for i, file in enumerate(files_list):
         src = os.path.join(args.in_dir[0], file)
         if not args.abspath:
+            print('current dir: %s' % os.curdir)
             src = os.path.relpath(src)
+            print('relative path to file: %s' % src)
         if args.out_name_list is not None:
             os.symlink(src, os.path.join(subject_dir, args.out_name_list[i]))
         else:
