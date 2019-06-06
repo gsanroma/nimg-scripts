@@ -28,10 +28,10 @@ os.makedirs(args.out_dir[0])
 for name in names_list:
     os.makedirs(os.path.join(args.out_dir[0], name))
 
-# change to output directory (in case not absolute paths)
-if not args.abspath:
-    print('changing to path %s' % args.out_dir[0])
-    os.chdir(args.out_dir[0])
+# # change to output directory (in case not absolute paths)
+# if not args.abspath:
+#     print('changing to path %s' % args.out_dir[0])
+#     os.chdir(args.out_dir[0])
 
 # link each subject files to the output subject subdirectory
 for name, files_list in zip(names_list, files_superlist_t):
