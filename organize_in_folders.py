@@ -39,8 +39,8 @@ for name, files_list in zip(names_list, files_superlist_t):
     for i, file in enumerate(files_list):
         src = os.path.join(args.in_dir[0], file)
         if not args.abspath:
-            print('current dir: %s' % os.curdir)
-            src = os.path.relpath(src)
+            # print('current dir: %s' % os.curdir)
+            src = os.path.relpath(src, args.out_dir[0])
             print('relative path to file: %s' % src)
         if args.out_name_list is not None:
             os.symlink(src, os.path.join(subject_dir, args.out_name_list[i]))
