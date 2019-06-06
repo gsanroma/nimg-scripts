@@ -11,6 +11,7 @@ parser.add_argument("--destination_dir", type=str, nargs=1, required=True, help=
 parser.add_argument("--leave_one_out", action='store_true', help='(optional) create sub-directories with filenames for leave-one-out (instead of directly linking all files to dest_dir)')
 parser.add_argument("--link_nonmatching", action='store_true', help='(optional) Link only files from source dir that do not match files in filenames dir')
 parser.add_argument("--insert_intfix", type=str, nargs=1, help="(optional) Intfix to be inserted before source suffix when creating the link")
+parser.add_argument("--abspath", action='store_true', help="whether to use absolute path for symlinks (default: relative from \'out_dir\')")
 
 args = parser.parse_args()
 
@@ -63,12 +64,21 @@ for sources_list, srcname in zip(sources_superlist, srcnames_list):
         out_file = source_file
         if args.insert_intfix is not None:
             out_file = source_file.split(args.source_suffix_list[i])[0] + args.insert_intfix[0] + args.source_suffix_list[i]
+
+        # define source
+        src = os.path.join(args.source_dir[0], source_file)
+
         # LOO?
         if not args.leave_one_out:
-            os.symlink(os.path.join(args.source_dir[0], source_file), os.path.join(args.destination_dir[0], out_file))
+            if not args.abspath:  # use relative path
+                src = os.path.relpath(src, args.destination_dir[0])
+            os.symlink(src, os.path.join(args.destination_dir[0], out_file))
+
         else:  # in case LOO link the files to all sub-directories corresponding to different filename
             for srcname2 in srcnames_list:
                 if srcname == srcname2:
                     continue
-                os.symlink(os.path.join(args.source_dir[0], source_file), os.path.join(args.destination_dir[0], srcname2, source_file))
+                if not args.abspath:  # use relative path
+                    src = os.path.relpath(src, os.path.join(args.destination_dir[0], srcname2))
+                os.symlink(src, os.path.join(args.destination_dir[0], srcname2, source_file))
 
