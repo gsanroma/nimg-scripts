@@ -38,7 +38,7 @@ for name, files_list in zip(names_list, files_superlist_t):
     for i, file in enumerate(files_list):
         src = os.path.join(args.in_dir[0], file)
         if not args.abspath:
-            src = os.path.relpath(os.path.join(args.in_dir[0], file))
+            src = os.path.relpath(src)
         if args.out_name_list is not None:
             os.symlink(src, os.path.join(subject_dir, args.out_name_list[i]))
         else:
