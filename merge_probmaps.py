@@ -24,8 +24,9 @@ if not os.path.exists(args.out_dir[0]):
 
 # main loop
 
-for file, name in zip(files_list, names_list):
+for name in names_list:
 
+    file = name + args.in_suffix[0]
     print("Processing %s" % file)
 
     ref_nib = None
