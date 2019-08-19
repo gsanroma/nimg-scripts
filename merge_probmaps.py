@@ -55,7 +55,7 @@ for file, name in zip(files_list, names_list):
     nib.save(seg_nib, os.path.join(args.out_dir[0], name + args.out_suffix[0]))
 
     # save probmaps
-    if args.keeprobmaps:
+    if args.keep_probmaps:
         avg_nib = nib.Nifti1Image(avg, ref_nib.affine, ref_nib.header)
         nib.save(avg_nib, os.path.join(args.out_dir[0], file))
 
