@@ -18,8 +18,6 @@ args = parser.parse_args()
 files_list = os.listdir(args.in_dir_list[0])
 names_list = [f.split(args.in_suffix[0])[0] for f in files_list if f.endswith(args.in_suffix[0])]
 
-print files_list
-
 # if dir doesn't exist, create
 if not os.path.exists(args.out_dir[0]):
     os.makedirs(args.out_dir[0])
@@ -41,11 +39,11 @@ for file, name in zip(files_list, names_list):
         prob = prob_nib.get_data()
 
         if avg is None:
-            avg = copy(prob) / float(len(args.in_dirs_list))
+            avg = copy(prob) / float(len(args.in_dir_list))
             ref_nib = copy(prob_nib)
         else:
             assert prob_nib.header.get_data_shape() == ref_nib.header.get_data_shape(), 'non-equal probmap shapes'
-            avg += prob / float(len(args.in_dirs_list))
+            avg += prob / float(len(args.in_dir_list))
 
     # threshold average
     seg = np.zeros(avg.shape, dtype=np.uint8)
