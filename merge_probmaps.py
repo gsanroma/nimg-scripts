@@ -27,7 +27,7 @@ if not os.path.exists(args.out_dir[0]):
 for name in names_list:
 
     file = name + args.in_suffix[0]
-    print("Processing %s" % file)
+    print("Processing %s" % name)
 
     ref_nib = None
     avg = None  # average probmap
