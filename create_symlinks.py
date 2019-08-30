@@ -28,7 +28,7 @@ if not args.link_nonmatching:  # normally link the files in source that match th
     # print [f for sources_list in sources_superlist for f in sources_list]
     # print [os.path.exists(os.path.join(args.source_dir[0], f)) for sources_list in sources_superlist for f in sources_list]
 else:  # link only those files in source that do not match to any file in filenames dir
-    names_list, files_superlist = get_files_superlist(args.source_dir, args.source_suffix_list)
+    names_list, files_superlist, _ = get_files_superlist(args.source_dir, args.source_suffix_list)
     srcnames_list = []
     for i, name in enumerate(names_list):
         if name in filenames_list: continue
