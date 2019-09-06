@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'src', 'modules'))
 from utils import get_files_superlist
 
 # get file list
-names_list, files_superlist = get_files_superlist(args.in_dir, args.in_suffix)
+names_list, files_superlist, _ = get_files_superlist(args.in_dir, args.in_suffix)
 files_list = files_superlist[0]
 in_dir = args.in_dir[0]
 
