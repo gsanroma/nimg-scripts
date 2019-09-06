@@ -13,7 +13,7 @@ parser.add_argument("--out_suffix", type=str, nargs=1, required=True, help="Suff
 parser.add_argument("--xfm_dir", type=str, nargs=1, help="(optional) directory with transforms")
 parser.add_argument("--xfm_suffix_list", type=str, nargs='+', help="(optional) List of suffixes of transforms (no optimization. If only 1, applied to all moving imgs.)")
 parser.add_argument("--searchxyz", type=float, nargs=1, default=[25.], help='search degrees in x, y, z axes (default 25) ')
-parser.add_argument("--num_procs", type=int, nargs=1, default=[8], help='number of concurrent processes ')
+parser.add_argument("--num_procs", type=int, nargs=1, default=[ ], help='number of concurrent processes ')
 
 
 args = parser.parse_args()
