@@ -56,7 +56,6 @@ if args.method[0] in ['NormalizedCorrelation']:
 launcher = None
 check_file_repeat = None
 if method_cmdline:
-    # sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'src', 'modules'))
     from scheduler import Launcher, check_file_repeat
 
     launcher = Launcher(args.num_procs[0])
@@ -64,7 +63,6 @@ if method_cmdline:
 
 # get file list
 
-# sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'src', 'modules'))
 from utils import get_files_superlist
 
 in1_names_list, files_superlist, _ = get_files_superlist(args.in_dir, args.in_suffix)
@@ -73,7 +71,7 @@ in1_dir = args.in_dir[0]
 
 # get file list 2
 if args.in2_dir is not None:
-    in2_names_list, files_superlist = get_files_superlist(args.in2_dir, args.in2_suffix)
+    in2_names_list, files_superlist, _ = get_files_superlist(args.in2_dir, args.in2_suffix)
     in2_files_list = files_superlist[0]
     in2_dir = args.in2_dir[0]
 else:

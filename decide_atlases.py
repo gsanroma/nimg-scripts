@@ -37,7 +37,6 @@ args = parser.parse_args()
 #                          '--num_val 10 '
 #                          ''.split())
 
-sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'src', 'modules'))
 from utils import read_sim_scores, get_files_superlist
 
 scores_dict = read_sim_scores(args.scores_file[0])
@@ -49,7 +48,7 @@ assert scores_dict['scores'].shape[0] == scores_dict['scores'].shape[1], "scores
 Idx = range(len(scores_dict['in1_files_list']))  # by default use all files
 if args.use_subset is not None:
     # read the file list
-    img_names_list, files_superlist = get_files_superlist([args.use_subset[0]], [args.use_subset[1]])
+    img_names_list, files_superlist, _ = get_files_superlist([args.use_subset[0]], [args.use_subset[1]])
     img_files_list = files_superlist[0]
     img_dir = args.use_subset[0]
     # get the corresponding indices in scores file

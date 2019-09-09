@@ -8,7 +8,6 @@ import sys
 from shutil import rmtree
 from copy import copy
 
-sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'src', 'modules'))
 from scheduler import Launcher
 
 #

@@ -18,10 +18,9 @@ assert len(args.in_suffix_list) > 1, 'must include more than one suffix'
 
 # List of files
 
-sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'src', 'modules'))
 from utils import get_files_superlist
 
-names_list, files_superlist = get_files_superlist(args.in_dir, args.in_suffix_list)
+names_list, files_superlist, _ = get_files_superlist(args.in_dir, args.in_suffix_list)
 
 #
 # Read actual files

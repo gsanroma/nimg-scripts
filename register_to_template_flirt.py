@@ -24,7 +24,6 @@ args = parser.parse_args()
 #                          '--xfm_suffix _flirt.mat '
 #                          ''.split())
 
-sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'src', 'modules'))
 from scheduler import Launcher
 
 launcher = Launcher(args.num_procs[0])

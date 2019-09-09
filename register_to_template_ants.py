@@ -22,7 +22,6 @@ parser.add_argument("--num_itk_threads", type=int, nargs=1, default=[1], help='n
 args = parser.parse_args()
 # args = parser.parse_args('--in_dir /Users/gsanroma/DATA/DATABASES/ADNI/atlases/kk --img_suffix moving.nii.gz --template_file /Users/gsanroma/DATA/DATABASES/ADNI/atlases/kk/fixed.nii.gz --transform Affine 4 --out_warp_intfix rigid3 --out_dir /Users/gsanroma/DATA/DATABASES/ADNI/atlases/kk --init_warp_dir_suffix /Users/gsanroma/DATA/DATABASES/ADNI/atlases/kk moving_warped0GenericAffine.mat --init_warp_dir_suffix /Users/gsanroma/DATA/DATABASES/ADNI/atlases/kk moving_masked_warped20GenericAffine.mat 1 --template_mask /Users/gsanroma/DATA/DATABASES/ADNI/atlases/kk/left2.nii.gz'.split())
 
-sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'src', 'modules'))
 from scheduler import Launcher
 
 launcher = Launcher(args.num_procs[0])

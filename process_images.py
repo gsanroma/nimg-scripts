@@ -29,7 +29,6 @@ args = parser.parse_args()
 # args = parser.parse_args('--in_dir /home/sanromag/DATA/WMH/train_RS/data_denoise2/ --img_suffix_list _FLAIR.nii.gz --maskout_suffix _brainmaskWarped.nii.gz --normalize --out_dir /home/sanromag/DATA/WMH/train_RS/data_denoise_norm/'.split())
 
 # start launcher and specify max amount of processes
-sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'src', 'modules'))
 from scheduler import Launcher
 
 launcher = Launcher(args.num_procs[0])

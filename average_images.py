@@ -11,7 +11,6 @@ parser.add_argument("--out_avg", type=str, nargs=1, help='output averaged image'
 
 args = parser.parse_args()
 
-sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'src', 'modules'))
 from utils import get_files_superlist
 
 # get file list

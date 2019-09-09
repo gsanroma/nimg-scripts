@@ -30,15 +30,14 @@ if args.out_suffix_list is not None:
     out_suffix_list = args.out_suffix_list
 
 # get files superlist
-sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'src', 'modules'))
 from utils import get_files_superlist
 
 # note that mask suffix is appended in the end
 unique_mask = False
 if args.mask_suffix is not None:
-    names_list, files_superlist = get_files_superlist(args.in_dir, args.in_suffix_list + args.mask_suffix)
+    names_list, files_superlist, _ = get_files_superlist(args.in_dir, args.in_suffix_list + args.mask_suffix)
 elif args.mask_file is not None:
-    names_list, files_superlist = get_files_superlist(args.in_dir, args.in_suffix_list)
+    names_list, files_superlist, _ = get_files_superlist(args.in_dir, args.in_suffix_list)
     unique_mask = True
 else:
     assert False, 'either suffix list or suffix file must be given'

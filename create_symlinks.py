@@ -15,7 +15,6 @@ parser.add_argument("--abspath", action='store_true', help="whether to use absol
 
 args = parser.parse_args()
 
-sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'src', 'modules'))
 from utils import get_files_superlist
 
 filenames_list, _, _ = get_files_superlist(args.filenames_dir, args.filenames_suffix)

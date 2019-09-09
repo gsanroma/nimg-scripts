@@ -23,7 +23,6 @@ args = parser.parse_args()
 #                          '--gtr_suffix _WMHmaskbin.nii.gz '.split())
 
 # start launcher and specify max amount of processes
-sys.path.insert(0, os.path.join(os.environ['HOME'], 'CODE', 'src', 'modules'))
 from scheduler import Launcher, check_file_repeat
 
 # Retrieve estimated files
